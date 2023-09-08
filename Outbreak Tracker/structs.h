@@ -1,3 +1,4 @@
+#define MAX_PLAYER_SLOTS 4
 #define MAX_ITEM 32
 #define MAX_ENEMY 12
 #define MAX_DOOR 19
@@ -193,6 +194,11 @@ typedef struct
 	unsigned short HP;
 	unsigned short Flag;
 } Door;
+
+typedef struct
+{
+    char RoomMaster;
+} RoomPriority;
 
 typedef struct
 {

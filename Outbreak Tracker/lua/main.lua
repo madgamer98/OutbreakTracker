@@ -10,14 +10,16 @@ require "ItemCard"
 require "DoorCard"
 require "LobbyCard"
 require "SPlayerCard"
+require "language"
 
 local InitResult = false
 local RetryTimer = 0
 local scalex,scaley = 300, 740
-local errorX, errorY = 0, 300
-local TimeSwtich=1
-local EnemyHPSwtich=1
-local ItemSwtich=1
+local errorX, errorY = 0, 500
+local TimeSwitch=1
+local PuzzleSwitch=1
+local EnemyHPSwitch=1
+local ItemSwitch=1
 local Style=0
 local HelpMenu=0
 local PlayerList=1
@@ -25,11 +27,13 @@ local EnemyList=0
 local ItemList=0
 local doorList=1
 local RoomName=1
+LanguageSwitch=0;
 
 Slots = {}
 SPlayers = {}
 Items = {}
 Items2 = {}
+RoomMasters = {}
 Doors = {}
 Players = {}
 Enemies = {}
@@ -350,9 +354,9 @@ function love.draw()
 		if (hs == 3 and s == "") then
 			UIAtlas:draw("title bar", 0, 2, 0, 1)
 			love.graphics.setFont(VerySmallFont)
-			love.graphics.printf("No.",10, 8,20, "right")
-			love.graphics.printf("Title & Scenario",40, 8,130, "left")
-			love.graphics.printf("HEADS",240, 8,50, "left")
+			love.graphics.printf(_l("No"),10, 8,20, "right")
+			love.graphics.printf(_l("Title & Scenario"),40, 8,130, "left")
+			love.graphics.printf(_l("HEADS"),240, 8,50, "left")
 			for i=1, lobby_n do
 				LobbyCards[i]:draw(lobby_x, (i-1)*lobby_y)		
 			end
@@ -396,9 +400,9 @@ function love.draw()
 
 		if not(GameInfo.scenario == "") then
 			if(f>0) then
-				if TimeSwtich==1 then
+				if TimeSwitch==1 then
 					love.graphics.printf(Time2string(GameInfo.frames / 0.03), time_x, time_y, 300, "right")
-				--elseif TimeSwtich==2 then
+				--elseif TimeSwitch==2 then
 				--	love.graphics.printf(RealTime(timer), time_x, time_y, 300, "right")
 				end
 				if(f > 0 and doorList ==1 )then
@@ -430,7 +434,7 @@ function love.draw()
 						end
 					end
 				end
-				if not(s == "") and (f > 0) and ItemSwtich ==1 then
+				if not(s == "") and (f > 0) and ItemSwitch ==1 then
 					love.graphics.printf(itemset+1 .."\n"..math.floor(r/10)+1, 0, itemr_y, 24, "center")
 					for i=1, 1 do
 						ItemCards[i]:draw(itemcard_x, itemcard_y)
@@ -609,10 +613,10 @@ function love.draw()
 							love.graphics.setFont(MiniFont)
 						if RoomName == 1 then
 							for i=1,13 do
-							love.graphics.printf("1"*(i-1)*2+1,2, 605+10*(i-1),12, "right")
-							love.graphics.printf(GetRoomName(s,(i-1)*2+1),16, 605+10*(i-1),160, "left")
-							love.graphics.printf("1"*(i-1)*2+2,150, 605+10*(i-1),12, "right")
-							love.graphics.printf(GetRoomName(s,(i-1)*2+2),166, 605+10*(i-1),160, "left")
+								love.graphics.printf("1"*(i-1)*2+1,2, 605+10*(i-1),12, "right")
+								love.graphics.printf(GetRoomName(s,(i-1)*2+1),16, 605+10*(i-1),160, "left")
+								love.graphics.printf("1"*(i-1)*2+2,150, 605+10*(i-1),12, "right")
+								love.graphics.printf(GetRoomName(s,(i-1)*2+2),166, 605+10*(i-1),160, "left")
 							end
 						elseif RoomName == 2 then
 							for i=1,13 do
@@ -688,7 +692,7 @@ function love.draw()
 					end
 				end	
 
-				if EnemyHPSwtich==1 then
+				if EnemyHPSwitch==1 then
 					if Style==0 then
 						--for i=8, 8 do
 						--	--if Boss[i].nameID==32 then
@@ -728,7 +732,7 @@ function love.draw()
 						end
 					end
 				end
-				if EnemyHPSwtich==2 then
+				if EnemyHPSwitch==2 then
 					if Style==0 then
 						--for i=8, 8 do
 						--	--if Boss[i].nameID==32 then
@@ -801,7 +805,7 @@ function love.draw()
 			end
 		end
 		love.graphics.setFont(TimeFont)
-		if EnemyHPSwtich<3 and f > 0 and EnemyList == 0 and ItemList ==0 then
+		if EnemyHPSwitch<3 and f > 0 and EnemyList == 0 and ItemList ==0 then
 			if (s == "wild things") then
 				if(GameInfo.wttime > 0) and not (GameInfo.wttime == 0xffff) then
 					love.graphics.printf(Time2string3(GameInfo.wttime), timeleft_x, timeleft_y, 300, "left")
@@ -812,13 +816,15 @@ function love.draw()
 				end
 				
 				if not (d == "easy") then
-					love.graphics.setFont(DefaultFont)
-					if (GameInfo.passwt%8 >= 4 and GameInfo.passwt%8 <8) then-- >=4 and <8, >=C and <F
-						love.graphics.setColor( 0, 200/255, 0, 1 )
-					else
-						love.graphics.setColor( 127/255, 127/255, 127/255, 1 )
+					if(PuzzleSwitch == 1) then
+						love.graphics.setFont(DefaultFont)
+						if (GameInfo.passwt%8 >= 4 and GameInfo.passwt%8 <8) then-- >=4 and <8, >=C and <F
+							love.graphics.setColor( 0, 200/255, 0, 1 )
+						else
+							love.graphics.setColor( 127/255, 127/255, 127/255, 1 )
+						end
+						love.graphics.printf(passwt, passwt_x, passwt_y, 300, "left")
 					end
-					love.graphics.printf(passwt, passwt_x, passwt_y, 300, "left")
 				end
 
 			love.graphics.setColor( 1, 1, 1, 1 )
@@ -844,12 +850,14 @@ function love.draw()
 
 				love.graphics.setFont(DefaultFont)
 				if(GameInfo.fighttime == 0) and (GameInfo.fighttime2 == 0xffff) then
-					if (GameInfo.passdt3%8 >= 4 and GameInfo.passdt3%8 <8) then-- >=4 and <8, >=C and <F						love.graphics.setColor( 0, 200/255, 0, 1 )
-						love.graphics.setColor( 0, 200/255, 0, 1 )
-					else
-						love.graphics.setColor( 127/255, 127/255, 127/255, 1 )
+					if(PuzzleSwitch == 1) then
+						if (GameInfo.passdt3%8 >= 4 and GameInfo.passdt3%8 <8) then-- >=4 and <8, >=C and <F						love.graphics.setColor( 0, 200/255, 0, 1 )
+							love.graphics.setColor( 0, 200/255, 0, 1 )
+						else
+							love.graphics.setColor( 127/255, 127/255, 127/255, 1 )
+						end
+						love.graphics.printf(passdt, timeleft_x, timeleft_y, 300, "left")
 					end
-					love.graphics.printf(passdt, timeleft_x, timeleft_y, 300, "left")
 				end
 
 			love.graphics.setColor( 1, 1, 1, 1 )
@@ -984,39 +992,49 @@ function love.draw()
 				end
 
 			elseif (s == "below freezing point") then
-				love.graphics.setFont(DefaultFont)
-				love.graphics.printf(passbfp.."-"..pass2bfp, timeleft_x, timeleft_y, 300, "left")
+				if(PuzzleSwitch == 1) then
+					love.graphics.setFont(DefaultFont)
+					love.graphics.printf(passbfp.."-"..pass2bfp, timeleft_x, timeleft_y, 300, "left")
+				end
 
 			elseif (s == "the hive") then
-				love.graphics.setFont(DefaultFont)
-				love.graphics.printf(passhive, timeleft_x, timeleft_y, 300, "left")
+				if(PuzzleSwitch == 1) then
+					love.graphics.setFont(DefaultFont)
+					love.graphics.printf(passhive, timeleft_x, timeleft_y, 300, "left")
+				end
 
 			elseif (s == "hellfire") then
-				love.graphics.setFont(DefaultFont)
-				love.graphics.printf(hfpass.."-"..hfmap.."-"..hfpower, timeleft_x, timeleft_y, 300, "left")
+				if(PuzzleSwitch == 1) then
+					love.graphics.setFont(DefaultFont)
+					love.graphics.printf(hfpass.."-"..hfmap.."-"..hfpower, timeleft_x, timeleft_y, 300, "left")
+				end
 
 			elseif (s == "decisions,decisions") then
-				love.graphics.setFont(DefaultFont)
-				love.graphics.printf(ddpass.."-"..clocktime, timeleft_x, timeleft_y, 300, "left")
+				if(PuzzleSwitch == 1) then
+					love.graphics.setFont(DefaultFont)
+					love.graphics.printf(ddpass.."-"..clocktime, timeleft_x, timeleft_y, 300, "left")
+				end
 
 			elseif (s == "underbelly") then
 				if(GameInfo.escapetime == 0 or GameInfo.escapetime == 0xffff)then
-					love.graphics.setFont(DefaultFont)
-					if(GameInfo.passub3%64 >=32) then
-						love.graphics.setColor( 0, 200/255, 0, 1 )
-					else
-						love.graphics.setColor( 127/255, 127/255, 127/255, 1 )
-					end
-					love.graphics.printf(passub1, timeleft_x, timeleft_y, 300, "left")
+					if(PuzzleSwitch == 1) then
+						love.graphics.setFont(DefaultFont)
+						if(GameInfo.passub3%64 >=32) then
+							love.graphics.setColor( 0, 200/255, 0, 1 )
+						else
+							love.graphics.setColor( 127/255, 127/255, 127/255, 1 )
+						end
+						love.graphics.printf(passub1, timeleft_x, timeleft_y, 300, "left")
 
-					if(GameInfo.passub3%32 >=16) then
-						love.graphics.setColor( 0, 200/255, 0, 1 )
-					else
-						love.graphics.setColor( 127/255, 127/255, 127/255, 1 )
+						if(GameInfo.passub3%32 >=16) then
+							love.graphics.setColor( 0, 200/255, 0, 1 )
+						else
+							love.graphics.setColor( 127/255, 127/255, 127/255, 1 )
+						end
+						love.graphics.printf(passub2, timeleft_x+60, timeleft_y, 300, "left")
 					end
-					love.graphics.printf(passub2, timeleft_x+60, timeleft_y, 300, "left")
 
-				love.graphics.setColor( 1, 1, 1, 1 )
+					love.graphics.setColor( 1, 1, 1, 1 )
 				else
 					love.graphics.setFont(TimeFont)
 					love.graphics.printf(Time2string3(GameInfo.escapetime), timeleft_x, timeleft_y, 60, "center")
@@ -1034,24 +1052,27 @@ function love.draw()
 			end
 		end	
 		if HelpMenu==1 then
-			love.graphics.rectangle('line',2,2,296,201,3,3,1)
+			love.graphics.rectangle('line',2,2,296,360,3,3,1)
 			love.graphics.setColor( 0, 0, 0, 0.85 )
-			love.graphics.rectangle('fill',2,2,296,201,3,3,1)
+			love.graphics.rectangle('fill',2,2,296,360,3,3,1)
 			love.graphics.setFont(VerySmallFont)
 			love.graphics.setColor( 1, 1, 1, 1 )
-			love.graphics.printf("Hotkeys list:\n F1: Show/hide help menu.\n F2: Show/hide item list/ F3: Switch room list.\n F4: Show/hide enemy list. F5: No border.\n 1/2/3/4: Change window size.\n I: Show/hide item list in current room.\n T: Show/hide Timers.\n E: Switch/hide enemy HP in current room.\n S: Simple window.\n A: Auto size.\n D: Default.\n H/V: Change layout style.\n ESC: Exit.", 4, 4, 300, "left")
+			love.graphics.printf(_l("Language list"), 4, 4, 300, "left")
+			love.graphics.printf(_l("Help Menu"), 4, 60, 300, "left")
 		end
 
 	elseif InitResult == false then
 		love.graphics.setFont(DefaultFont)
-		love.graphics.printf("Unable to find PCSX2 process.\n Will try again in " .. tostring(math.floor(5-RetryTimer + 0.5)) .. ".", errorX, errorY, 300, "center")
+		love.graphics.printf(_l("Unable to find PCSX2 process.\n Will try again in ") .. tostring(math.floor(5-RetryTimer + 0.5)) .. ".", errorX, errorY, 300, "center")
 		love.graphics.setFont(VerySmallFont)
-		love.graphics.printf("Hotkeys list:\n F1: Show/hide help menu.\n F2: Show/hide item list/ F3: Switch room list.\n F4: Show/hide enemy list. F5: No border.\n 1/2/3/4: Change window size.\n I: Show/hide item list in current room.\n T: Show/hide Timers.\n E: Switch/hide enemy HP in current room.\n S: Simple window.\n A: Auto size.\n D: Default.\n H/V: Change layout style.\n ESC: Exit.\n\nCredits\n    Program: Fothsid, killme\n    Thanks: morshi, alyssaprimp\nCode: github.com/phoe-nix/OutbreakTracker", 4, 4, 300, "left")
+		love.graphics.printf(_l("Language list"), 4, 4, 300, "left")
+		love.graphics.printf(_l("Hotkeys list"), 4, 60, 300, "left")
 	elseif InitResult == true and GameInfo.currentFile == 255 then
 		love.graphics.setFont(DefaultFont)
-		love.graphics.printf("This is not Biohazard Outbreak game.\n Will try again in " .. tostring(math.floor(5-RetryTimer + 0.5)) .. ".", errorX, errorY, 300, "center")
+		love.graphics.printf(_l("This is not Biohazard Outbreak game.\n Will try again in ") .. tostring(math.floor(5-RetryTimer + 0.5)) .. ".", errorX, errorY, 300, "center")
 		love.graphics.setFont(VerySmallFont)
-		love.graphics.printf("Hotkeys list:\n F1: Show/hide help menu.\n F2: Show/hide item list/ F3: Switch room list.\n F4: Show/hide enemy list. F5: No border.\n 1/2/3/4: Change window size.\n I: Show/hide item list in current room.\n T: Show/hide Timers.\n E: Switch/hide enemy HP in current room.\n S: Simple window.\n A: Auto size.\n D: Default.\n H/V: Change layout style.\n ESC: Exit.\n\nCredits\n    Program: Fothsid, killme\n    Thanks: morshi, alyssaprimp\nCode: github.com/phoe-nix/OutbreakTracker", 4, 4, 300, "left")
+		love.graphics.printf(_l("Language list"), 4, 4, 300, "left")
+		love.graphics.printf(_l("Hotkeys list"), 4, 60, 300, "left")
 	end
 end
 
@@ -1104,7 +1125,7 @@ function love.update(dt)
 					SPlayers[i] = tracker.getSlotPlayer(i)
 				end
 			--end
-			if not(s == "") and (f > 0) and ItemSwtich ==1 then
+			if not(s == "") and (f > 0) and ItemSwitch ==1 then
 				for i=1, 1 do
 					Items[i] = tracker.getItem(i)
 				end
@@ -1114,7 +1135,7 @@ function love.update(dt)
 					Players[i] = tracker.getPlayer(i)
 				end
 			end
-			if not(s == "") and (f > 0) and EnemyHPSwtich ==1 then
+			if not(s == "") and (f > 0) and EnemyHPSwitch ==1 then
 				for i=1, 12 do
 					Enemies[i] = tracker.getEnemy(i)
 				end
@@ -1134,6 +1155,11 @@ function love.update(dt)
 					Doors[i] = tracker.getDoor(i)
 				end
 			end
+			if not(s == "") and (f > 0) then
+				for i=1, 128 do
+					RoomMasters[i] = tracker.getRoomMaster(i)
+				end
+			end
 		end
 	end
 end
@@ -1147,15 +1173,15 @@ function love.keypressed(key)
 		love.event.quit()
 	end
 	--if key == "f5" then
-	--	if doorList==0 then doorList=1 ItemList=0 ItemSwtich=0 PlayerList =0 EnemyHPSwtich=0 TimeSwtich=0
+	--	if doorList==0 then doorList=1 ItemList=0 ItemSwitch=0 PlayerList =0 EnemyHPSwitch=0 TimeSwitch=0
 		--elseif EnemyList==1 then EnemyList=2
-	--	else doorList=0 PlayerList =1 EnemyHPSwtich=1 ItemSwtich=1 TimeSwtich=1
+	--	else doorList=0 PlayerList =1 EnemyHPSwitch=1 ItemSwitch=1 TimeSwitch=1
 	--	end
 	--end
 	if key == "f4" then
-		if EnemyList==0 then EnemyList=1 ItemList=0 ItemSwtich=0 PlayerList =0 EnemyHPSwtich=0 TimeSwtich=0 doorList=0
+		if EnemyList==0 then EnemyList=1 ItemList=0 ItemSwitch=0 PlayerList =0 EnemyHPSwitch=0 TimeSwitch=0 doorList=0
 		--elseif EnemyList==1 then EnemyList=2
-		else EnemyList=0 PlayerList =1 EnemyHPSwtich=1 ItemSwtich=1 TimeSwtich=1 doorList=1
+		else EnemyList=0 PlayerList =1 EnemyHPSwitch=1 ItemSwitch=1 TimeSwitch=1 doorList=1
 		end
 	end
 	if key == "f8" then love.window.setMode(wx, wy,{borderless=true,resizable=true,vsync = 3}) love.window.setPosition(x, y)end
@@ -1165,9 +1191,9 @@ function love.keypressed(key)
 		end
 	end	
 	if key == "f2" then --vsync
-		if ItemList==0 then ItemList=1 ItemSwtich=0 PlayerList =0 EnemyHPSwtich=0 EnemyList=0 TimeSwtich=0  doorList=0
-		elseif ItemList==1 then ItemList=2 ItemSwtich=0 PlayerList =0 EnemyHPSwtich=0 EnemyList=0 TimeSwtich=0 doorList=0
-		else ItemList=0 ItemSwtich=1 PlayerList =1 EnemyHPSwtich=1 TimeSwtich=1 doorList=1
+		if ItemList==0 then ItemList=1 ItemSwitch=0 PlayerList =0 EnemyHPSwitch=0 EnemyList=0 TimeSwitch=0  doorList=0
+		elseif ItemList==1 then ItemList=2 ItemSwitch=0 PlayerList =0 EnemyHPSwitch=0 EnemyList=0 TimeSwitch=0 doorList=0
+		else ItemList=0 ItemSwitch=1 PlayerList =1 EnemyHPSwitch=1 TimeSwitch=1 doorList=1
 		end
 	end
 	if key == "f3" then
@@ -1189,37 +1215,47 @@ function love.keypressed(key)
 	if key == "d" then love.window.setMode(300, 160+(145*4),{resizable=true,vsync = 3}) love.window.setPosition(x, y)scalex,scaley = 300, 160+(145*4) Style = 0 end
 	if key == "h" then love.window.setMode(300*4+150, 145+60,{resizable=true,vsync = 3}) love.window.setPosition(x, y)scalex,scaley = 300*4+150, 145+60 Style = 1 end
 	if key == "v" then love.window.setMode(300, 160+(145*4),{resizable=true,vsync = 3}) love.window.setPosition(x, y)scalex,scaley = 300, 160+(145*4) Style = 0 end
+	if key =="l" then
+		if LanguageSwitch == 0 then LanguageSwitch=1
+		elseif LanguageSwitch==1 then LanguageSwitch=0
+		end
+	end
 	if InitResult then
 		if not(s == "") then
 			if key =="kp0" then
-				PlayerSwtich=0 EnemyHPSwtich=1
+				PlayerSwitch=0 EnemyHPSwitch=1
 			end
 			if key =="kp1" then
-				PlayerSwtich=1 EnemyHPSwtich=2
+				PlayerSwitch=1 EnemyHPSwitch=2
 			end
 			if key =="kp2" then
-				PlayerSwtich=2 EnemyHPSwtich=2
+				PlayerSwitch=2 EnemyHPSwitch=2
 			end
 			if key =="kp3" then
-				PlayerSwtich=3 EnemyHPSwtich=2
+				PlayerSwitch=3 EnemyHPSwitch=2
 			end
 			if key =="kp4" then
-				PlayerSwtich=4 EnemyHPSwtich=2
+				PlayerSwitch=4 EnemyHPSwitch=2
 			end
 			if key =="t" then
-				if TimeSwtich == 0 then TimeSwtich=1
-				elseif TimeSwtich==1 then TimeSwtich=0
+				if TimeSwitch == 0 then TimeSwitch=1
+				elseif TimeSwitch==1 then TimeSwitch=0
 				end
 			end
 			if key =="i" then
-				if ItemSwtich == 0 then ItemSwtich=1
-				elseif ItemSwtich==1 then ItemSwtich=0
+				if ItemSwitch == 0 then ItemSwitch=1
+				elseif ItemSwitch==1 then ItemSwitch=0
+				end
+			end
+			if key =="q" then
+				if PuzzleSwitch == 0 then PuzzleSwitch=1
+				elseif PuzzleSwitch==1 then PuzzleSwitch=0
 				end
 			end
 			if key =="e" then
-				if EnemyHPSwtich == 0 then EnemyHPSwtich=1
-				elseif EnemyHPSwtich==1 then EnemyHPSwtich=2
-				elseif EnemyHPSwtich==2 then EnemyHPSwtich=0
+				if EnemyHPSwitch == 0 then EnemyHPSwitch=1
+				elseif EnemyHPSwitch==1 then EnemyHPSwitch=2
+				elseif EnemyHPSwitch==2 then EnemyHPSwitch=0
 				end
 			end
 			if key == "1" then love.window.setMode(300, (145*1),{resizable=true,vsync = 3}) love.window.setPosition(x, y)scalex,scaley = 300, (145*1) end
