@@ -6,10 +6,17 @@ Tracker program for the ps2 Outbreak games.
 
 ## How to use releases
 
-1. Download the lastest love2d 64bit: https://love2d.org/
+1. Download the lastest love2d 64bit (Zipped): https://love2d.org/
 2. Extract out the love2d zip file into a folder
 3. Extract the Outbreak Tracker release zip file into the same folder
 4. Run OutbreakTracker.exe
+
+### If you are having an error stating that you don't have SDL2.dll or love2d.dll
+You must extract out the files of the Outbreak tracker release zip and the love2d zip into the same folder. Below is an example gif
+![Extracting Outbreak Tracker](https://github.com/madgamer98/OutbreakTracker/assets/20719536/273df821-69b3-4fe6-a7a6-5751e4c394f9)
+
+
+
 
 if can't see anything in the program, you need update video card driver.
 
