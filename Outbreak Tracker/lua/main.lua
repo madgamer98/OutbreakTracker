@@ -1169,9 +1169,6 @@ function love.keypressed(key)
 	wx, wy, display = love.window.getMode()
 	local p = GameInfo.playernum
 
-	if key == "escape" then
-		love.event.quit()
-	end
 	--if key == "f5" then
 	--	if doorList==0 then doorList=1 ItemList=0 ItemSwitch=0 PlayerList =0 EnemyHPSwitch=0 TimeSwitch=0
 		--elseif EnemyList==1 then EnemyList=2
